@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.29306.81
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediviaTaskReader", "MediviaTaskReader.csproj", "{D63A0F30-20B1-4DEC-A6E7-7BDD3DBFA2CC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "taskreader", "..\taskreader\taskreader.vcxproj", "{F6DBF7F7-8CFA-4115-8AB1-88782813636A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,16 +27,6 @@ Global
 		{D63A0F30-20B1-4DEC-A6E7-7BDD3DBFA2CC}.Release|x64.Build.0 = Release|Any CPU
 		{D63A0F30-20B1-4DEC-A6E7-7BDD3DBFA2CC}.Release|x86.ActiveCfg = Release|Any CPU
 		{D63A0F30-20B1-4DEC-A6E7-7BDD3DBFA2CC}.Release|x86.Build.0 = Release|Any CPU
-		{F6DBF7F7-8CFA-4115-8AB1-88782813636A}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{F6DBF7F7-8CFA-4115-8AB1-88782813636A}.Debug|x64.ActiveCfg = Debug|x64
-		{F6DBF7F7-8CFA-4115-8AB1-88782813636A}.Debug|x64.Build.0 = Debug|x64
-		{F6DBF7F7-8CFA-4115-8AB1-88782813636A}.Debug|x86.ActiveCfg = Debug|Win32
-		{F6DBF7F7-8CFA-4115-8AB1-88782813636A}.Debug|x86.Build.0 = Debug|Win32
-		{F6DBF7F7-8CFA-4115-8AB1-88782813636A}.Release|Any CPU.ActiveCfg = Release|Win32
-		{F6DBF7F7-8CFA-4115-8AB1-88782813636A}.Release|x64.ActiveCfg = Release|x64
-		{F6DBF7F7-8CFA-4115-8AB1-88782813636A}.Release|x64.Build.0 = Release|x64
-		{F6DBF7F7-8CFA-4115-8AB1-88782813636A}.Release|x86.ActiveCfg = Release|Win32
-		{F6DBF7F7-8CFA-4115-8AB1-88782813636A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
