@@ -23,11 +23,15 @@ namespace MediviaTaskReader.Objects
       this.baseAddress = Convert.ToUInt64(process.MainModule.BaseAddress.ToInt64());
     }
 
+    public IntPtr Handle()
+    {
+      return this.handle;
+    }
     public string Name()
     {
       UInt64 localBase = Memory.ReadUInt64(this.handle, this.baseAddress + nameBaseOffset);
       Int32 nameLength = Memory.ReadInt32(this.handle, localBase + nameLengthOffset);
-      MessageBox.Show(nameLength.ToString());
+
       if(nameLength > 16)
       {
         UInt64 nameAddress = Memory.ReadUInt64(this.handle, localBase + nameOffset);
@@ -35,6 +39,11 @@ namespace MediviaTaskReader.Objects
       }
 
       return Memory.ReadString(this.handle, localBase + nameOffset);
+    }
+
+    public override string ToString()
+    {
+      return this.Name();
     }
 
   }

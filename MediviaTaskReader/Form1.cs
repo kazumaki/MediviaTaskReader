@@ -21,9 +21,12 @@ namespace MediviaTaskReader
 
     private void Button1_Click(object sender, EventArgs e)
     {
-      Process test = Process.GetProcessesByName("Medivia")[1];
-      Character testChar = new Character(test);
-      MessageBox.Show(testChar.Name());
+      listBox1.Items.Clear();
+      foreach(Process p in Process.GetProcessesByName("Medivia"))
+      {
+        listBox1.Items.Add(new Character(p));
+      }
+
     }
   }
 }
