@@ -49,7 +49,7 @@ namespace MediviaTaskReader.APICall
     public static extern IntPtr GetModuleHandle(string lpModuleName);
 
     [DllImport("kernel32.dll")]
-    public static extern Int32 WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress,
+    public static extern Int64 WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress,
     [In, Out] byte[] buffer, UInt32 size, out IntPtr lpNumberOfBytesWritten);
 
     [DllImport("kernel32.dll")]

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
 using MediviaTaskReader.Objects;
+using MediviaTaskReader.IPC;
 
 namespace MediviaTaskReader
 {
@@ -31,7 +32,9 @@ namespace MediviaTaskReader
 
     private void Button2_Click(object sender, EventArgs e)
     {
-
+      Character currentCharacter = (Character)listBox1.SelectedItem;
+      MainLayer mainLayer = new MainLayer();
+      mainLayer.Connect(currentCharacter);
     }
   }
 }
