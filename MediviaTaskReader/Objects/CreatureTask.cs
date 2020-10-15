@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 using System.Threading;
 using MediviaTaskReader.IPC;
 
@@ -16,11 +17,20 @@ namespace MediviaTaskReader.Objects
     private MainLayer ipc;
     private TimerCallback updateTimerCallback;
     private Timer updateTimer;
+    string allFileName;
+    string creatureFileName;
+    string currentFileName;
+    string totalFileName;
     public CreatureTask(string name, MainLayer ipc)
     {
       this.updateTimerCallback = this.update;
       this.updateTimer = new Timer(this.updateTimerCallback, "Test", 1000, 5000);
       this.name = name;
+      this.allFileName = Directory.GetCurrentDirectory() + $@"\tasks\{this.getTaskName()}_all.txt";
+      this.creatureFileName = Directory.GetCurrentDirectory() + $@"\tasks\{this.getTaskName()}_creature.txt";
+      this.currentFileName = Directory.GetCurrentDirectory() + $@"\tasks\{this.getTaskName()}_current.txt";
+      this.totalFileName = Directory.GetCurrentDirectory() + $@"\tasks\{this.getTaskName()}_total.txt";
+      this.startFiles();
       this.current = 0;
       this.total = 0;
       this.ipc = ipc;
@@ -61,6 +71,22 @@ namespace MediviaTaskReader.Objects
       return this.name + " " + this.current.ToString() + " " + this.total.ToString();
     }
 
+    private void startFiles()
+    {
+      this.fileCreation(allFileName);
+      this.fileCreation(creatureFileName);
+      this.fileCreation(currentFileName);
+      this.fileCreation(totalFileName);
+    }
+
+    private void fileCreation(string fileName)
+    {
+      if (!File.Exists(fileName))
+      {
+        File.Create(fileName).Close();
+      }
+    }
+
     private void update(object state)
     {
       if (this.ipc.MessagesDictionary.ContainsKey(this.getTaskName()))
@@ -68,12 +94,20 @@ namespace MediviaTaskReader.Objects
         TaskMessage result;
         if(this.ipc.MessagesDictionary[this.getTaskName()].TryPop(out result))
         {
-          this.current = result.Current;
-          this.total = result.Total;
-          System.Windows.Forms.MessageBox.Show(this.ToString());
           this.ipc.MessagesDictionary[this.getTaskName()].Clear();
+          this.updateFiles(result);
         }
       }
+    }
+
+    private void updateFiles(TaskMessage message)
+    {
+      this.current = message.Current;
+      this.total = message.Total;
+      File.WriteAllText(this.allFileName, this.ToString());
+      File.WriteAllText(this.creatureFileName, this.name);
+      File.WriteAllText(this.currentFileName, this.current.ToString());
+      File.WriteAllText(this.totalFileName, this.total.ToString());
     }
   }
 }
