@@ -5,13 +5,15 @@
 #include <iostream>;
 
 
-#define TEST_PIPE_NAME L"\\\\.\\pipe\\MediviaTaskReader"
+#define SEND_DATA_PIPE_NAME L"\\\\.\\pipe\\MediviaTaskReaderSend"
+#define RECEIVE_DATA_PIPE_NAME L"\\\\.\\pipe\\MediviaTaskReaderReceive"
 
 typedef void(__fastcall* ProcessTextMessage)(DWORD_PTR textPtr);
 DWORD_PTR BaseAddress;
 HMODULE HandleModule;
 HANDLE SendDataPipe;
-DWORD SendDataPipeThreadID;
+HANDLE ReceiveDataPipe;
+DWORD ReceiveDataPipeThreadID;
 BOOL isRunning;
 ProcessTextMessage ProcessTextMessagePointer;
 
@@ -44,7 +46,7 @@ DWORD_PTR getBufferAddress() {
 
 void __fastcall hookProcessTextMessage(DWORD_PTR textPtr) {
 	DWORD_PTR bufferAddress = getBufferAddress();
-	long messageType = *(long*)(bufferAddress);
+	long long messageType = *(long long*)(bufferAddress);
 
 	if (messageType == 16) {
 		DWORD_PTR messageAddress = *(DWORD_PTR*)(bufferAddress - 0x8);
@@ -72,11 +74,63 @@ BOOL writeCharPointer(HANDLE& pipe, const char* value)
 		return false;
 }
 
-DWORD WINAPI DataSendThread(LPVOID) {
+DWORD WINAPI ReceiveDataThread(LPVOID) {
 	do
 	{
-		SendDataPipe = CreateFile(TEST_PIPE_NAME,
-			GENERIC_READ | GENERIC_WRITE | PIPE_WAIT,
+		ReceiveDataPipe = CreateFile(RECEIVE_DATA_PIPE_NAME,
+			GENERIC_READ | PIPE_WAIT,
+			0,
+			NULL,
+			CREATE_NEW,
+			0,
+			NULL);
+	} while (ReceiveDataPipe == INVALID_HANDLE_VALUE);
+
+	bool readSuccess = false;
+
+	unsigned char buffer[512];
+
+	DWORD byteReads;
+
+	while (true) {
+		readSuccess = false;
+
+		do
+		{
+			readSuccess = ReadFile(ReceiveDataPipe, buffer, 512 * sizeof(wchar_t), &byteReads, nullptr);
+		} while (!readSuccess);
+
+		if (((byte)* buffer) == 0xFF) {
+			break;
+		}
+	}
+
+	MessageBoxA(NULL, "MEME", "MEME", MB_OK);
+
+
+
+	DetourTransactionBegin();
+	DetourUpdateThread(GetCurrentThread());
+	// this will hook the function
+	DetourDetach(&(PVOID&)(ProcessTextMessagePointer), &hookProcessTextMessage);
+	DetourTransactionCommit();
+	FreeLibraryAndExitThread(HandleModule, 0);
+	return 0;
+}
+
+void start() {
+	BaseAddress = (DWORD_PTR)GetModuleHandle(NULL);
+	ProcessTextMessagePointer = (ProcessTextMessage)(BaseAddress + 0x22B40);
+	DetourTransactionBegin();
+	DetourUpdateThread(GetCurrentThread());
+	DetourAttach(&(PVOID&)(ProcessTextMessagePointer), (PVOID)hookProcessTextMessage);
+	DetourTransactionCommit();
+	isRunning = true;
+
+	do
+	{
+		SendDataPipe = CreateFile(SEND_DATA_PIPE_NAME,
+			GENERIC_WRITE | PIPE_WAIT,
 			0,
 			NULL,
 			CREATE_NEW,
@@ -84,7 +138,7 @@ DWORD WINAPI DataSendThread(LPVOID) {
 			NULL);
 	} while (SendDataPipe == INVALID_HANDLE_VALUE);
 
-	return 0;
+	CreateThread(NULL, NULL, &ReceiveDataThread, NULL, NULL, &ReceiveDataPipeThreadID);
 }
 
 BOOL APIENTRY DllMain( HMODULE hModule,
@@ -96,15 +150,8 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     {
     case DLL_PROCESS_ATTACH:
 		HandleModule = hModule;
-		BaseAddress = (DWORD_PTR)GetModuleHandle(NULL);
-		ProcessTextMessagePointer = (ProcessTextMessage)(BaseAddress + 0x22B40);
-		DetourTransactionBegin();
-		DetourUpdateThread(GetCurrentThread());
-		DetourAttach(&(PVOID&)(ProcessTextMessagePointer), (PVOID)hookProcessTextMessage);
-		DetourTransactionCommit();
-		isRunning = true;
-
-		CreateThread(NULL, NULL, &DataSendThread, NULL, NULL, &SendDataPipeThreadID);
+		DisableThreadLibraryCalls(hModule);
+		start();
 		break;
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:

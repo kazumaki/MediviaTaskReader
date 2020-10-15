@@ -15,7 +15,8 @@ namespace MediviaTaskReader.IPC
   public class MainLayer
   {
     private bool isConnected;
-    private NamedPipeServerStream namedPipeServer;
+    private NamedPipeServerStream sendDataPipeServer;
+    private NamedPipeServerStream receiveDataPipeServer;
     private Thread processMessagesThread;
     private ConcurrentStack<string> messagesStack;
     private ConcurrentDictionary<string, ConcurrentStack<TaskMessage>> messagesDictionary;
@@ -50,11 +51,12 @@ namespace MediviaTaskReader.IPC
       }
 
       DLLInjector.Inject(character.Handle(), @Directory.GetCurrentDirectory() + @"\taskreader.dll");
-      this.namedPipeServer = new NamedPipeServerStream("MediviaTaskReader", PipeDirection.InOut, 100, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
-
+      this.sendDataPipeServer = new NamedPipeServerStream("MediviaTaskReaderSend", PipeDirection.InOut, 100, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+      this.receiveDataPipeServer = new NamedPipeServerStream("MediviaTaskReaderReceive", PipeDirection.InOut, 100, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
       this.processMessagesThread.Start();
       this.filterMessagesTimerCallback = this.filterMessages;
       this.filterMessagesTimer = new Timer(this.filterMessagesTimerCallback, "Test", 1000, 5000);
+      this.isConnected = true;
     }
 
     public void Disconnect()
@@ -64,12 +66,17 @@ namespace MediviaTaskReader.IPC
         return;
       }
 
-      this.namedPipeServer.Disconnect();
+      this.isConnected = false;
+
+      this.receiveDataPipeServer.Write(BitConverter.GetBytes(0xFF), 0, 1);
+      this.sendDataPipeServer.Disconnect();
+      this.receiveDataPipeServer.Disconnect();
     }
 
     private void processMessagesMethod()
     {
-      this.namedPipeServer.WaitForConnection();
+      this.sendDataPipeServer.WaitForConnection();
+      this.receiveDataPipeServer.WaitForConnection();
       System.Windows.Forms.MessageBox.Show("Conectado");
       while (true)
       {
@@ -118,7 +125,7 @@ namespace MediviaTaskReader.IPC
     private byte[] readBytes()
     {
       byte[] buffer = new byte[512];
-      this.namedPipeServer.Read(buffer, 0, buffer.Length);
+      this.sendDataPipeServer.Read(buffer, 0, buffer.Length);
       return buffer;
     }
 

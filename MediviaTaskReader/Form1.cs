@@ -43,5 +43,15 @@ namespace MediviaTaskReader
       CreatureTask task = new CreatureTask(textBox1.Text, this.mainLayer);
       listBox2.Items.Add(task);
     }
+
+    private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+    {
+      this.mainLayer.Disconnect();
+    }
+
+    private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+    {
+      this.mainLayer.Disconnect();
+    }
   }
 }
