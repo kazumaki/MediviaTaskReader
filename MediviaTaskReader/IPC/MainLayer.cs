@@ -4,7 +4,6 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Threading;
 using System.IO.Pipes;
 using System.IO;
@@ -19,31 +18,43 @@ namespace MediviaTaskReader.IPC
     private NamedPipeServerStream namedPipeServer;
     private Thread processMessagesThread;
     private ConcurrentStack<string> messagesStack;
-    private System.Threading.Timer timer;
-    private System.Threading.TimerCallback timerCallback;
+    private ConcurrentDictionary<string, ConcurrentStack<TaskMessage>> messagesDictionary;
+    private List<CreatureTask> tasks;
+    private Timer filterMessagesTimer;
+    private TimerCallback filterMessagesTimerCallback;
     public MainLayer()
     {
       this.isConnected = false;
       this.messagesStack = new ConcurrentStack<string>();
-      this.timerCallback = this.cleanMessagesStack;
-      this.timer = new System.Threading.Timer(this.timerCallback, "test", 1000, 10000);
+      this.messagesDictionary = new ConcurrentDictionary<string, ConcurrentStack<TaskMessage>>();
       this.processMessagesThread = new Thread(() => this.processMessagesMethod())
       {
         IsBackground = true
       };
     }
 
-    public void Connect(Character character)
+    public ConcurrentDictionary<string, ConcurrentStack<TaskMessage>> MessagesDictionary
     {
+      get
+      {
+        return this.messagesDictionary;
+      }
+    }
+
+    public void Connect(Character character, List<CreatureTask> tasks)
+    {
+      this.tasks = tasks;
       if(this.isConnected)
       {
         return;
       }
 
       DLLInjector.Inject(character.Handle(), @Directory.GetCurrentDirectory() + @"\taskreader.dll");
-      this.namedPipeServer = new NamedPipeServerStream("MediviaTaskReader", PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+      this.namedPipeServer = new NamedPipeServerStream("MediviaTaskReader", PipeDirection.InOut, 100, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
 
       this.processMessagesThread.Start();
+      this.filterMessagesTimerCallback = this.filterMessages;
+      this.filterMessagesTimer = new Timer(this.filterMessagesTimerCallback, "Test", 1000, 5000);
     }
 
     public void Disconnect()
@@ -56,26 +67,10 @@ namespace MediviaTaskReader.IPC
       this.namedPipeServer.Disconnect();
     }
 
-    private void cleanMessagesStack(Object state)
-    {
-      string currentMessage = "";
-      while(this.messagesStack.Count != 0)
-      {
-        messagesStack.TryPop(out currentMessage);
-        if (currentMessage.Contains("defeated"))
-        {
-          this.messagesStack.Clear();
-          break;
-        }
-      }
-
-      MessageBox.Show(currentMessage);
-    }
-
     private void processMessagesMethod()
     {
       this.namedPipeServer.WaitForConnection();
-      MessageBox.Show("Conectado");
+      System.Windows.Forms.MessageBox.Show("Conectado");
       while (true)
       {
         try
@@ -86,6 +81,36 @@ namespace MediviaTaskReader.IPC
         catch
         {
 
+        }
+      }
+    }
+
+    private void filterMessages(object state)
+    {
+      HashSet<string> alreadyAppeared = new HashSet<string>();
+
+      while (!this.messagesStack.IsEmpty)
+      {
+        string currentMessage;
+        messagesStack.TryPop(out currentMessage);
+        string[] strippedMessage = currentMessage.Split(' ');
+
+        if(strippedMessage.Length >= 11 && strippedMessage.Length <= 14)
+        {
+          int nameLen = strippedMessage.Length - 10;
+          int current = Convert.ToInt32(strippedMessage[5]);
+          int total = Convert.ToInt32(strippedMessage[strippedMessage.Length - 2]);
+          string[] strippedCreatureName = new string[nameLen];
+          Array.Copy(strippedMessage, 6, strippedCreatureName, 0, nameLen);
+          string creatureName = string.Join(" ", strippedCreatureName).ToLower();
+          if(this.messagesDictionary.ContainsKey(creatureName))
+          {
+            this.messagesDictionary[creatureName].Push(new TaskMessage(currentMessage, current, total));
+          }
+          else
+          {
+            this.messagesDictionary[creatureName] = new ConcurrentStack<TaskMessage>();
+          }
         }
       }
     }

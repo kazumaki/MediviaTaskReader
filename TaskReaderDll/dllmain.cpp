@@ -32,12 +32,13 @@ BOOL sendMessage(const char* message) {
 
 DWORD_PTR getBufferAddress() {
 	DWORD_PTR bufferBaseAddress;
-	bufferBaseAddress = BaseAddress + 0x0D45D60;
+	bufferBaseAddress = BaseAddress + 0x0D45368;
 	bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)bufferBaseAddress;
-	bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0xF0);
-	bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x10);
-	bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x2B8);
-	bufferBaseAddress += 0x668;
+	bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x1E0);
+	bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x110);
+	bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x660);
+	bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x20);
+	bufferBaseAddress += 0x338;
 	return bufferBaseAddress;
 }
 

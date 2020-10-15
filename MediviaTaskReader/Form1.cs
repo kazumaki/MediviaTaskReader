@@ -15,6 +15,7 @@ namespace MediviaTaskReader
 {
   public partial class Form1 : Form
   {
+    private MainLayer mainLayer;
     public Form1()
     {
       InitializeComponent();
@@ -33,8 +34,14 @@ namespace MediviaTaskReader
     private void Button2_Click(object sender, EventArgs e)
     {
       Character currentCharacter = (Character)listBox1.SelectedItem;
-      MainLayer mainLayer = new MainLayer();
-      mainLayer.Connect(currentCharacter);
+      this.mainLayer = new MainLayer();
+      mainLayer.Connect(currentCharacter, listBox2.Items.Cast<CreatureTask>().ToList());
+    }
+
+    private void Button3_Click(object sender, EventArgs e)
+    {
+      CreatureTask task = new CreatureTask(textBox1.Text, this.mainLayer);
+      listBox2.Items.Add(task);
     }
   }
 }
