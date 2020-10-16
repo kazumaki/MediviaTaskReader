@@ -11,13 +11,11 @@ namespace MediviaTaskReader.Objects
   public class Client
   {
     Form1 mainForm;
-    bool isConnected;
     MainLayer mainLayerIPC;
 
     public Client(Form1 mainForm)
     {
       this.mainForm = mainForm;
-      this.isConnected = false;
       this.mainLayerIPC = new MainLayer();
       this.getClients();
     }
@@ -64,10 +62,27 @@ namespace MediviaTaskReader.Objects
 
       if (selectedIndex >= 0)
       {
+        Character selectedCharacter = (Character)this.mainForm.clientCharacterListBox.SelectedItem;
+        if (this.mainLayerIPC.IsConnected)
+        {
+          this.displayError("Click exit button first!");
+          return;
+        }
 
+        this.mainLayerIPC.Connect(selectedCharacter);
       }
       else
         this.displayError("No character selected!");
+    }
+
+    public void ExitClient()
+    {
+      if (this.mainLayerIPC.IsConnected)
+      {
+        this.mainLayerIPC.Disconnect();
+      }
+      else
+        this.displayError("You didn't selected any client yet!");
     }
 
     private void getClients()

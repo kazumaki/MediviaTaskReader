@@ -51,5 +51,10 @@ namespace MediviaTaskReader
     {
       this.client.SelectClient();
     }
+
+    private void ButtonClientExit_Click(object sender, EventArgs e)
+    {
+      this.client.ExitClient();
+    }
   }
 }

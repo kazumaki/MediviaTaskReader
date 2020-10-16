@@ -15,12 +15,11 @@ namespace MediviaTaskReader.IPC
   public class MainLayer
   {
     private bool isConnected;
+    private Storages storages;
     private NamedPipeServerStream sendDataPipeServer;
     private NamedPipeServerStream receiveDataPipeServer;
     private Thread processMessagesThread;
-    private ConcurrentStack<string> messagesStack;
-    private ConcurrentDictionary<string, ConcurrentStack<TaskMessage>> messagesDictionary;
-    private List<CreatureTask> tasks;
+
     private Timer filterMessagesTimer;
     private TimerCallback filterMessagesTimerCallback;
     private Timer cleanMessagesTimer;
@@ -28,12 +27,7 @@ namespace MediviaTaskReader.IPC
     public MainLayer()
     {
       this.isConnected = false;
-      this.messagesStack = new ConcurrentStack<string>();
-      this.messagesDictionary = new ConcurrentDictionary<string, ConcurrentStack<TaskMessage>>();
-      this.processMessagesThread = new Thread(() => this.processMessagesMethod())
-      {
-        IsBackground = true
-      };
+      this.storages = new Storages();
     }
 
     public bool IsConnected
@@ -42,17 +36,14 @@ namespace MediviaTaskReader.IPC
       private set { }
     }
 
-    public ConcurrentDictionary<string, ConcurrentStack<TaskMessage>> MessagesDictionary
+    public Storages DataStorages
     {
-      get
-      {
-        return this.messagesDictionary;
-      }
+      get { return this.storages; }
+      private set { }
     }
 
-    public void Connect(Character character, List<CreatureTask> tasks)
+    public void Connect(Character character)
     {
-      this.tasks = tasks;
       if(this.isConnected)
       {
         return;
@@ -61,6 +52,10 @@ namespace MediviaTaskReader.IPC
       DLLInjector.Inject(character.Handle(), @Directory.GetCurrentDirectory() + @"\taskreader.dll");
       this.sendDataPipeServer = new NamedPipeServerStream("MediviaTaskReaderSend", PipeDirection.InOut, 100, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
       this.receiveDataPipeServer = new NamedPipeServerStream("MediviaTaskReaderReceive", PipeDirection.InOut, 100, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+      this.processMessagesThread = new Thread(() => this.processMessagesMethod())
+      {
+        IsBackground = true
+      };
       this.processMessagesThread.Start();
       this.filterMessagesTimerCallback = this.filterMessages;
       this.filterMessagesTimer = new Timer(this.filterMessagesTimerCallback, "Test", 1000, 500);
@@ -77,10 +72,10 @@ namespace MediviaTaskReader.IPC
       }
 
       this.isConnected = false;
-
       this.receiveDataPipeServer.Write(BitConverter.GetBytes(0xFF), 0, 1);
       this.sendDataPipeServer.Disconnect();
       this.receiveDataPipeServer.Disconnect();
+      this.processMessagesThread.Abort();
     }
 
     private void processMessagesMethod()
@@ -88,15 +83,19 @@ namespace MediviaTaskReader.IPC
       this.sendDataPipeServer.WaitForConnection();
       this.receiveDataPipeServer.WaitForConnection();
       System.Windows.Forms.MessageBox.Show("Conectado");
-      while (true)
+      while (this.isConnected)
       {
         try
         {
           string message = Encoding.UTF8.GetString(this.readBytes()).Trim('\0');
-          this.messagesStack.Push(message);
+          this.storages.MessagesStack.Push(message);
         }
         catch(Exception error)
         {
+          if(error.GetType().ToString() == "System.Threading.ThreadAbortException")
+          {
+            return;
+          }
           System.Windows.Forms.MessageBox.Show(error.ToString());
         }
       }
@@ -104,14 +103,14 @@ namespace MediviaTaskReader.IPC
 
     private void cleanMessages(object state)
     {
-      this.messagesStack.Clear();
+      this.storages.MessagesStack.Clear();
     }
 
     private void filterMessages(object state)
     {
       try
       {
-        while (!this.messagesStack.IsEmpty)
+        while (!this.storages.MessagesStack.IsEmpty)
         {
           string currentMessage;
           if(messagesStack.TryPop(out currentMessage))

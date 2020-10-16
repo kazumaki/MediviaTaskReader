@@ -153,6 +153,7 @@
       this.buttonClientExit.TabIndex = 3;
       this.buttonClientExit.Text = "Exit";
       this.buttonClientExit.UseVisualStyleBackColor = true;
+      this.buttonClientExit.Click += new System.EventHandler(this.ButtonClientExit_Click);
       // 
       // buttonTaskClear
       // 
