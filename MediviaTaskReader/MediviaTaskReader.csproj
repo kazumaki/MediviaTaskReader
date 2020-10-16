@@ -54,6 +54,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="IPC\MainLayer.cs" />
+    <Compile Include="IPC\Storages.cs" />
     <Compile Include="Objects\Character.cs" />
     <Compile Include="Objects\Client.cs" />
     <Compile Include="Objects\CreatureTask.cs" />

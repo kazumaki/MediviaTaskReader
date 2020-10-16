@@ -20,10 +20,6 @@ namespace MediviaTaskReader.IPC
     private NamedPipeServerStream receiveDataPipeServer;
     private Thread processMessagesThread;
 
-    private Timer filterMessagesTimer;
-    private TimerCallback filterMessagesTimerCallback;
-    private Timer cleanMessagesTimer;
-    private TimerCallback cleanMessagesTimerCallback;
     public MainLayer()
     {
       this.isConnected = false;
@@ -57,10 +53,6 @@ namespace MediviaTaskReader.IPC
         IsBackground = true
       };
       this.processMessagesThread.Start();
-      this.filterMessagesTimerCallback = this.filterMessages;
-      this.filterMessagesTimer = new Timer(this.filterMessagesTimerCallback, "Test", 1000, 500);
-      this.cleanMessagesTimerCallback = this.cleanMessages;
-      this.cleanMessagesTimer = new Timer(this.cleanMessagesTimerCallback, "Test", 1000, 30000);
       this.isConnected = true;
     }
 
@@ -98,48 +90,6 @@ namespace MediviaTaskReader.IPC
           }
           System.Windows.Forms.MessageBox.Show(error.ToString());
         }
-      }
-    }
-
-    private void cleanMessages(object state)
-    {
-      this.storages.MessagesStack.Clear();
-    }
-
-    private void filterMessages(object state)
-    {
-      try
-      {
-        while (!this.storages.MessagesStack.IsEmpty)
-        {
-          string currentMessage;
-          if(messagesStack.TryPop(out currentMessage))
-          {
-            string[] strippedMessage = currentMessage.Split(' ');
-            if (strippedMessage.Length >= 11 && strippedMessage.Length <= 14)
-            {
-              int nameLen = strippedMessage.Length - 10;
-              int current = Convert.ToInt32(strippedMessage[5]);
-              int total = Convert.ToInt32(strippedMessage[strippedMessage.Length - 2]);
-              string[] strippedCreatureName = new string[nameLen];
-              Array.Copy(strippedMessage, 6, strippedCreatureName, 0, nameLen);
-              string creatureName = string.Join(" ", strippedCreatureName).ToLower();
-              if (this.messagesDictionary.ContainsKey(creatureName))
-              {
-                this.messagesDictionary[creatureName].Push(new TaskMessage(currentMessage, current, total));
-              }
-              else
-              {
-                this.messagesDictionary[creatureName] = new ConcurrentStack<TaskMessage>();
-                this.messagesDictionary[creatureName].Push(new TaskMessage(currentMessage, current, total));
-              }
-            }
-          }
-        }
-      }
-      catch (Exception error)
-      {
-        System.Windows.Forms.MessageBox.Show(error.ToString());
       }
     }
 

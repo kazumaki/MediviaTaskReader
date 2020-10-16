@@ -12,11 +12,13 @@ namespace MediviaTaskReader.Objects
   {
     Form1 mainForm;
     MainLayer mainLayerIPC;
+    private TaskList taskList;
 
     public Client(Form1 mainForm)
     {
       this.mainForm = mainForm;
       this.mainLayerIPC = new MainLayer();
+      this.taskList = new TaskList(this.mainForm);
       this.getClients();
     }
 
@@ -24,7 +26,7 @@ namespace MediviaTaskReader.Objects
     {
       string creatureName = this.mainForm.textTaskCreatureName.Text;
       CreatureTask newTask = new CreatureTask(creatureName, this.mainLayerIPC);
-      this.mainForm.tasksCheckedListBox.Items.Add(creatureName);
+      this.mainForm.tasksCheckedListBox.Items.Add(newTask);
     }
 
     public void RemoveTask()

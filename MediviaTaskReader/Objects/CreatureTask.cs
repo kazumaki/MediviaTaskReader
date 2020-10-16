@@ -15,16 +15,12 @@ namespace MediviaTaskReader.Objects
     private int total;
     private string name;
     private MainLayer ipc;
-    private TimerCallback updateTimerCallback;
-    private Timer updateTimer;
     string allFileName;
     string creatureFileName;
     string currentFileName;
     string totalFileName;
     public CreatureTask(string name, MainLayer ipc)
     {
-      this.updateTimerCallback = this.update;
-      this.updateTimer = new Timer(this.updateTimerCallback, "Test", 1000, 1000);
       this.name = name;
       this.allFileName = Directory.GetCurrentDirectory() + $@"\tasks\{this.getTaskName()}_all.txt";
       this.creatureFileName = Directory.GetCurrentDirectory() + $@"\tasks\{this.getTaskName()}_creature.txt";
@@ -87,17 +83,19 @@ namespace MediviaTaskReader.Objects
       }
     }
 
-    private void update(object state)
+    public void update()
     {
       try
       {
-        if (this.ipc.MessagesDictionary.ContainsKey(this.getTaskName()))
+        if (this.ipc.DataStorages.MessagesDictionary.ContainsKey(this.getTaskName()))
         {
-          TaskMessage result;
-          if(this.ipc.MessagesDictionary[this.getTaskName()].TryPop(out result))
+          TaskMessage message;
+          if(this.ipc.DataStorages.MessagesDictionary[this.getTaskName()].TryPop(out message))
           {
-            this.ipc.MessagesDictionary[this.getTaskName()].Clear();
-            this.updateFiles(result);
+            this.current = message.Current;
+            this.total = message.Total;
+            this.ipc.DataStorages.MessagesDictionary[this.getTaskName()].Clear();
+            this.updateFiles(message);
           }
 
         }
