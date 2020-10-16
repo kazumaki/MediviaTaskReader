@@ -24,7 +24,7 @@ namespace MediviaTaskReader.Objects
     public CreatureTask(string name, MainLayer ipc)
     {
       this.updateTimerCallback = this.update;
-      this.updateTimer = new Timer(this.updateTimerCallback, "Test", 1000, 5000);
+      this.updateTimer = new Timer(this.updateTimerCallback, "Test", 1000, 1000);
       this.name = name;
       this.allFileName = Directory.GetCurrentDirectory() + $@"\tasks\{this.getTaskName()}_all.txt";
       this.creatureFileName = Directory.GetCurrentDirectory() + $@"\tasks\{this.getTaskName()}_creature.txt";
@@ -68,7 +68,7 @@ namespace MediviaTaskReader.Objects
 
     public override string ToString()
     {
-      return this.name + " " + this.current.ToString() + " " + this.total.ToString();
+      return this.name + " " + this.current.ToString() + "/" + this.total.ToString();
     }
 
     private void startFiles()
@@ -89,15 +89,23 @@ namespace MediviaTaskReader.Objects
 
     private void update(object state)
     {
-      if (this.ipc.MessagesDictionary.ContainsKey(this.getTaskName()))
+      try
       {
-        TaskMessage result;
-        if(this.ipc.MessagesDictionary[this.getTaskName()].TryPop(out result))
+        if (this.ipc.MessagesDictionary.ContainsKey(this.getTaskName()))
         {
-          this.ipc.MessagesDictionary[this.getTaskName()].Clear();
-          this.updateFiles(result);
+          TaskMessage result;
+          if(this.ipc.MessagesDictionary[this.getTaskName()].TryPop(out result))
+          {
+            this.ipc.MessagesDictionary[this.getTaskName()].Clear();
+            this.updateFiles(result);
+          }
+
         }
+      }catch(Exception error)
+      {
+        System.Windows.Forms.MessageBox.Show(error.ToString());
       }
+
     }
 
     private void updateFiles(TaskMessage message)

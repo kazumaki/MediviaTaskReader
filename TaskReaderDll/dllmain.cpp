@@ -33,24 +33,41 @@ BOOL sendMessage(const char* message) {
 }
 
 DWORD_PTR getBufferAddress() {
-	DWORD_PTR bufferBaseAddress;
-	bufferBaseAddress = BaseAddress + 0x0D45368;
-	bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)bufferBaseAddress;
-	bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x1E0);
-	bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x110);
-	bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x660);
-	bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x20);
-	bufferBaseAddress += 0x338;
+	DWORD_PTR bufferBaseAddress = 0;
+	try {
+		//bufferBaseAddress = BaseAddress + 0x0D45368;
+		//bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)bufferBaseAddress;
+		//bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x1E0);
+		//bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x110);
+		//bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x660);
+		//bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x20);
+		//bufferBaseAddress += 0x338;
+		bufferBaseAddress = BaseAddress + 0x0D54F38;
+		bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)bufferBaseAddress;
+		bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x58);
+		bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x38);
+		bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x18);
+		bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x20);
+		bufferBaseAddress = bufferBaseAddress > 0 ? bufferBaseAddress + 0x618 : 0;
+	}
+	catch(int e){
+
+	}
 	return bufferBaseAddress;
 }
 
 void __fastcall hookProcessTextMessage(DWORD_PTR textPtr) {
 	DWORD_PTR bufferAddress = getBufferAddress();
-	long long messageType = *(long long*)(bufferAddress);
+	try {
+		long long messageType = *(long long*)(bufferAddress);
+		CString intStr;
+		if (messageType == 16) {
+			DWORD_PTR messageAddress = *(DWORD_PTR*)(bufferAddress - 0x8);
+			sendMessage((char*)messageAddress);
+		}
+	}
+	catch (int e) {
 
-	if (messageType == 16) {
-		DWORD_PTR messageAddress = *(DWORD_PTR*)(bufferAddress - 0x8);
-		sendMessage((char*)messageAddress);
 	}
 
 	return ProcessTextMessagePointer(textPtr);
@@ -78,7 +95,7 @@ DWORD WINAPI ReceiveDataThread(LPVOID) {
 	do
 	{
 		ReceiveDataPipe = CreateFile(RECEIVE_DATA_PIPE_NAME,
-			GENERIC_READ | PIPE_WAIT,
+			GENERIC_READ | GENERIC_WRITE | PIPE_WAIT,
 			0,
 			NULL,
 			CREATE_NEW,
@@ -130,7 +147,7 @@ void start() {
 	do
 	{
 		SendDataPipe = CreateFile(SEND_DATA_PIPE_NAME,
-			GENERIC_WRITE | PIPE_WAIT,
+			GENERIC_WRITE | GENERIC_READ | PIPE_WAIT,
 			0,
 			NULL,
 			CREATE_NEW,

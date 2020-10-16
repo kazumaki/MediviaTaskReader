@@ -1,2 +1,17 @@
 So far you have defeated 1 Spiders out of 10 required.
-13:38 Congratulations! You have finished the task of killing Small Spiders with total amount of 10 kills.
+13:38 Congratulations! You have finished the task of killing Small Spiders with total amount of 10 kills. type 9
+
+	bufferBaseAddress = BaseAddress + 0x0D45368;
+	bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)bufferBaseAddress;
+	bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x1E0);
+	bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x110);
+	bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x660);
+	bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x20);
+	bufferBaseAddress += 0x338;
+
+0d54f38
+58
+38
+18
+20
+618
