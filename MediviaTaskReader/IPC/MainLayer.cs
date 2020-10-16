@@ -36,6 +36,12 @@ namespace MediviaTaskReader.IPC
       };
     }
 
+    public bool IsConnected
+    {
+      get { return this.isConnected; }
+      private set { }
+    }
+
     public ConcurrentDictionary<string, ConcurrentStack<TaskMessage>> MessagesDictionary
     {
       get

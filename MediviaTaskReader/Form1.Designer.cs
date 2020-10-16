@@ -28,95 +28,174 @@
     /// </summary>
     private void InitializeComponent()
     {
-      this.button1 = new System.Windows.Forms.Button();
-      this.listBox1 = new System.Windows.Forms.ListBox();
-      this.button2 = new System.Windows.Forms.Button();
-      this.textBox1 = new System.Windows.Forms.TextBox();
-      this.listBox2 = new System.Windows.Forms.ListBox();
-      this.button3 = new System.Windows.Forms.Button();
+      this.buttonClientRefresh = new System.Windows.Forms.Button();
+      this.clientCharacterListBox = new System.Windows.Forms.ListBox();
+      this.buttonClientSelect = new System.Windows.Forms.Button();
+      this.tasksCheckedListBox = new System.Windows.Forms.CheckedListBox();
+      this.groupBox1 = new System.Windows.Forms.GroupBox();
+      this.label1 = new System.Windows.Forms.Label();
+      this.buttonTaskAdd = new System.Windows.Forms.Button();
+      this.buttonTaskRemove = new System.Windows.Forms.Button();
+      this.textTaskCreatureName = new System.Windows.Forms.TextBox();
+      this.groupBox2 = new System.Windows.Forms.GroupBox();
+      this.buttonClientExit = new System.Windows.Forms.Button();
+      this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+      this.buttonTaskClear = new System.Windows.Forms.Button();
+      this.groupBox1.SuspendLayout();
+      this.groupBox2.SuspendLayout();
       this.SuspendLayout();
       // 
-      // button1
+      // buttonClientRefresh
       // 
-      this.button1.Location = new System.Drawing.Point(414, 238);
-      this.button1.Name = "button1";
-      this.button1.Size = new System.Drawing.Size(75, 23);
-      this.button1.TabIndex = 0;
-      this.button1.Text = "button1";
-      this.button1.UseVisualStyleBackColor = true;
-      this.button1.Click += new System.EventHandler(this.Button1_Click);
+      this.buttonClientRefresh.Location = new System.Drawing.Point(29, 185);
+      this.buttonClientRefresh.Name = "buttonClientRefresh";
+      this.buttonClientRefresh.Size = new System.Drawing.Size(75, 23);
+      this.buttonClientRefresh.TabIndex = 0;
+      this.buttonClientRefresh.Text = "Refresh";
+      this.buttonClientRefresh.UseVisualStyleBackColor = true;
+      this.buttonClientRefresh.Click += new System.EventHandler(this.ButtonClientRefresh_Click);
       // 
-      // listBox1
+      // clientCharacterListBox
       // 
-      this.listBox1.FormattingEnabled = true;
-      this.listBox1.Location = new System.Drawing.Point(414, 121);
-      this.listBox1.Name = "listBox1";
-      this.listBox1.Size = new System.Drawing.Size(294, 95);
-      this.listBox1.TabIndex = 1;
+      this.clientCharacterListBox.FormattingEnabled = true;
+      this.clientCharacterListBox.Location = new System.Drawing.Point(29, 16);
+      this.clientCharacterListBox.Name = "clientCharacterListBox";
+      this.clientCharacterListBox.Size = new System.Drawing.Size(259, 134);
+      this.clientCharacterListBox.TabIndex = 1;
       // 
-      // button2
+      // buttonClientSelect
       // 
-      this.button2.Location = new System.Drawing.Point(633, 238);
-      this.button2.Name = "button2";
-      this.button2.Size = new System.Drawing.Size(75, 23);
-      this.button2.TabIndex = 2;
-      this.button2.Text = "button2";
-      this.button2.UseVisualStyleBackColor = true;
-      this.button2.Click += new System.EventHandler(this.Button2_Click);
+      this.buttonClientSelect.Location = new System.Drawing.Point(123, 185);
+      this.buttonClientSelect.Name = "buttonClientSelect";
+      this.buttonClientSelect.Size = new System.Drawing.Size(75, 23);
+      this.buttonClientSelect.TabIndex = 2;
+      this.buttonClientSelect.Text = "Select";
+      this.buttonClientSelect.UseVisualStyleBackColor = true;
+      this.buttonClientSelect.Click += new System.EventHandler(this.ButtonClientSelect_Click);
       // 
-      // textBox1
+      // tasksCheckedListBox
       // 
-      this.textBox1.Location = new System.Drawing.Point(30, 207);
-      this.textBox1.Name = "textBox1";
-      this.textBox1.Size = new System.Drawing.Size(153, 20);
-      this.textBox1.TabIndex = 3;
+      this.tasksCheckedListBox.FormattingEnabled = true;
+      this.tasksCheckedListBox.Location = new System.Drawing.Point(18, 17);
+      this.tasksCheckedListBox.Name = "tasksCheckedListBox";
+      this.tasksCheckedListBox.Size = new System.Drawing.Size(229, 94);
+      this.tasksCheckedListBox.TabIndex = 6;
       // 
-      // listBox2
+      // groupBox1
       // 
-      this.listBox2.FormattingEnabled = true;
-      this.listBox2.Location = new System.Drawing.Point(30, 93);
-      this.listBox2.Name = "listBox2";
-      this.listBox2.Size = new System.Drawing.Size(153, 95);
-      this.listBox2.TabIndex = 4;
+      this.groupBox1.Controls.Add(this.buttonTaskClear);
+      this.groupBox1.Controls.Add(this.label1);
+      this.groupBox1.Controls.Add(this.tasksCheckedListBox);
+      this.groupBox1.Controls.Add(this.buttonTaskAdd);
+      this.groupBox1.Controls.Add(this.buttonTaskRemove);
+      this.groupBox1.Controls.Add(this.textTaskCreatureName);
+      this.groupBox1.Location = new System.Drawing.Point(351, 12);
+      this.groupBox1.Name = "groupBox1";
+      this.groupBox1.Size = new System.Drawing.Size(264, 214);
+      this.groupBox1.TabIndex = 7;
+      this.groupBox1.TabStop = false;
+      this.groupBox1.Text = "Tasks";
       // 
-      // button3
+      // label1
       // 
-      this.button3.Location = new System.Drawing.Point(78, 238);
-      this.button3.Name = "button3";
-      this.button3.Size = new System.Drawing.Size(75, 23);
-      this.button3.TabIndex = 5;
-      this.button3.Text = "button3";
-      this.button3.UseVisualStyleBackColor = true;
-      this.button3.Click += new System.EventHandler(this.Button3_Click);
+      this.label1.AutoSize = true;
+      this.label1.Location = new System.Drawing.Point(15, 153);
+      this.label1.Name = "label1";
+      this.label1.Size = new System.Drawing.Size(81, 13);
+      this.label1.TabIndex = 8;
+      this.label1.Text = "Creature Name:";
+      // 
+      // buttonTaskAdd
+      // 
+      this.buttonTaskAdd.Location = new System.Drawing.Point(84, 185);
+      this.buttonTaskAdd.Name = "buttonTaskAdd";
+      this.buttonTaskAdd.Size = new System.Drawing.Size(75, 23);
+      this.buttonTaskAdd.TabIndex = 9;
+      this.buttonTaskAdd.Text = "Add";
+      this.buttonTaskAdd.UseVisualStyleBackColor = true;
+      this.buttonTaskAdd.Click += new System.EventHandler(this.ButtonTaskAdd_Click);
+      // 
+      // buttonTaskRemove
+      // 
+      this.buttonTaskRemove.Location = new System.Drawing.Point(18, 117);
+      this.buttonTaskRemove.Name = "buttonTaskRemove";
+      this.buttonTaskRemove.Size = new System.Drawing.Size(105, 23);
+      this.buttonTaskRemove.TabIndex = 10;
+      this.buttonTaskRemove.Text = "Remove";
+      this.buttonTaskRemove.UseVisualStyleBackColor = true;
+      this.buttonTaskRemove.Click += new System.EventHandler(this.ButtonTaskRemove_Click);
+      // 
+      // textTaskCreatureName
+      // 
+      this.textTaskCreatureName.Location = new System.Drawing.Point(102, 150);
+      this.textTaskCreatureName.Name = "textTaskCreatureName";
+      this.textTaskCreatureName.Size = new System.Drawing.Size(145, 20);
+      this.textTaskCreatureName.TabIndex = 7;
+      // 
+      // groupBox2
+      // 
+      this.groupBox2.Controls.Add(this.buttonClientExit);
+      this.groupBox2.Controls.Add(this.clientCharacterListBox);
+      this.groupBox2.Controls.Add(this.buttonClientRefresh);
+      this.groupBox2.Controls.Add(this.buttonClientSelect);
+      this.groupBox2.Location = new System.Drawing.Point(12, 12);
+      this.groupBox2.Name = "groupBox2";
+      this.groupBox2.Size = new System.Drawing.Size(322, 214);
+      this.groupBox2.TabIndex = 8;
+      this.groupBox2.TabStop = false;
+      this.groupBox2.Text = "Client Selector";
+      // 
+      // buttonClientExit
+      // 
+      this.buttonClientExit.Location = new System.Drawing.Point(213, 185);
+      this.buttonClientExit.Name = "buttonClientExit";
+      this.buttonClientExit.Size = new System.Drawing.Size(75, 23);
+      this.buttonClientExit.TabIndex = 3;
+      this.buttonClientExit.Text = "Exit";
+      this.buttonClientExit.UseVisualStyleBackColor = true;
+      // 
+      // buttonTaskClear
+      // 
+      this.buttonTaskClear.Location = new System.Drawing.Point(142, 117);
+      this.buttonTaskClear.Name = "buttonTaskClear";
+      this.buttonTaskClear.Size = new System.Drawing.Size(105, 23);
+      this.buttonTaskClear.TabIndex = 11;
+      this.buttonTaskClear.Text = "Clear";
+      this.buttonTaskClear.UseVisualStyleBackColor = true;
+      this.buttonTaskClear.Click += new System.EventHandler(this.ButtonTaskClear_Click);
       // 
       // Form1
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(800, 450);
-      this.Controls.Add(this.button3);
-      this.Controls.Add(this.listBox2);
-      this.Controls.Add(this.textBox1);
-      this.Controls.Add(this.button2);
-      this.Controls.Add(this.listBox1);
-      this.Controls.Add(this.button1);
+      this.ClientSize = new System.Drawing.Size(627, 237);
+      this.Controls.Add(this.groupBox2);
+      this.Controls.Add(this.groupBox1);
       this.Name = "Form1";
-      this.Text = "Form1";
-      this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
-      this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
+      this.Text = "MediviaTaskReader";
+      this.Load += new System.EventHandler(this.Form1_Load);
+      this.groupBox1.ResumeLayout(false);
+      this.groupBox1.PerformLayout();
+      this.groupBox2.ResumeLayout(false);
       this.ResumeLayout(false);
-      this.PerformLayout();
 
     }
 
     #endregion
 
-    private System.Windows.Forms.Button button1;
-    private System.Windows.Forms.ListBox listBox1;
-    private System.Windows.Forms.Button button2;
-    private System.Windows.Forms.TextBox textBox1;
-    private System.Windows.Forms.ListBox listBox2;
-    private System.Windows.Forms.Button button3;
+    private System.Windows.Forms.Button buttonClientRefresh;
+    private System.Windows.Forms.Button buttonClientSelect;
+    private System.Windows.Forms.GroupBox groupBox1;
+    private System.Windows.Forms.GroupBox groupBox2;
+    private System.Windows.Forms.Button buttonClientExit;
+    private System.ComponentModel.BackgroundWorker backgroundWorker1;
+    private System.Windows.Forms.Label label1;
+    private System.Windows.Forms.Button buttonTaskAdd;
+    private System.Windows.Forms.Button buttonTaskRemove;
+    public System.Windows.Forms.TextBox textTaskCreatureName;
+    public System.Windows.Forms.CheckedListBox tasksCheckedListBox;
+    private System.Windows.Forms.Button buttonTaskClear;
+    public System.Windows.Forms.ListBox clientCharacterListBox;
   }
 }
 

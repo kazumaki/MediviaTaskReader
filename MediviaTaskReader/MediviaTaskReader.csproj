@@ -55,7 +55,9 @@
     </Compile>
     <Compile Include="IPC\MainLayer.cs" />
     <Compile Include="Objects\Character.cs" />
+    <Compile Include="Objects\Client.cs" />
     <Compile Include="Objects\CreatureTask.cs" />
+    <Compile Include="Objects\TaskList.cs" />
     <Compile Include="Objects\TaskMessage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -16,42 +16,40 @@ namespace MediviaTaskReader
   public partial class Form1 : Form
   {
     private MainLayer mainLayer;
+    private Client client;
     public Form1()
     {
       InitializeComponent();
     }
 
-    private void Button1_Click(object sender, EventArgs e)
+    private void Form1_Load(object sender, EventArgs e)
     {
-      listBox1.Items.Clear();
-      foreach(Process p in Process.GetProcessesByName("Medivia"))
-      {
-        listBox1.Items.Add(new Character(p));
-      }
-
+      this.client = new Client(this);
     }
 
-    private void Button2_Click(object sender, EventArgs e)
+    private void ButtonTaskAdd_Click(object sender, EventArgs e)
     {
-      Character currentCharacter = (Character)listBox1.SelectedItem;
-      this.mainLayer = new MainLayer();
-      mainLayer.Connect(currentCharacter, listBox2.Items.Cast<CreatureTask>().ToList());
+      this.client.AddTask();
     }
 
-    private void Button3_Click(object sender, EventArgs e)
+    private void ButtonTaskRemove_Click(object sender, EventArgs e)
     {
-      CreatureTask task = new CreatureTask(textBox1.Text, this.mainLayer);
-      listBox2.Items.Add(task);
+      this.client.RemoveTask();
     }
 
-    private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+    private void ButtonTaskClear_Click(object sender, EventArgs e)
     {
-      this.mainLayer.Disconnect();
+      this.client.ClearTask();
     }
 
-    private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+    private void ButtonClientRefresh_Click(object sender, EventArgs e)
     {
-      this.mainLayer.Disconnect();
+      this.client.RefreshCharacters();
+    }
+
+    private void ButtonClientSelect_Click(object sender, EventArgs e)
+    {
+      this.client.SelectClient();
     }
   }
 }
