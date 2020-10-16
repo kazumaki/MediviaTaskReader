@@ -18,6 +18,7 @@ BOOL isRunning;
 ProcessTextMessage ProcessTextMessagePointer;
 
 BOOL sendMessage(const char* message) {
+	MessageBoxA(NULL, message, "text", MB_OK);
 	bool writeSuccess = false;
 	DWORD bytesWritten;
 
@@ -32,6 +33,7 @@ BOOL sendMessage(const char* message) {
 		return false;
 }
 
+
 DWORD_PTR getBufferAddress() {
 	DWORD_PTR bufferBaseAddress = 0;
 	try {
@@ -42,13 +44,15 @@ DWORD_PTR getBufferAddress() {
 		//bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x660);
 		//bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x20);
 		//bufferBaseAddress += 0x338;
-		bufferBaseAddress = BaseAddress + 0x0D54F38;
+		bufferBaseAddress = BaseAddress + 0x0D54F88;
 		bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)bufferBaseAddress;
-		bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x58);
-		bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x38);
-		bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x18);
+		bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x7E8);
 		bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x20);
-		bufferBaseAddress = bufferBaseAddress > 0 ? bufferBaseAddress + 0x618 : 0;
+		bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x20);
+		bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x28);
+		bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x60);
+		bufferBaseAddress = (DWORD_PTR) * (DWORD_PTR*)(bufferBaseAddress + 0x20);
+		bufferBaseAddress = bufferBaseAddress > 0 ? bufferBaseAddress + 0x388 : 0;
 	}
 	catch(int e){
 
@@ -63,7 +67,9 @@ void __fastcall hookProcessTextMessage(DWORD_PTR textPtr) {
 		CString intStr;
 		if (messageType == 16) {
 			DWORD_PTR messageAddress = *(DWORD_PTR*)(bufferAddress - 0x8);
-			sendMessage((char*)messageAddress);
+			char* message = (char*)messageAddress;
+			if(!IsBadReadPtr(message, sizeof(message)))
+				sendMessage(message);
 		}
 	}
 	catch (int e) {
