@@ -58,6 +58,8 @@
     <Compile Include="Objects\Character.cs" />
     <Compile Include="Objects\Client.cs" />
     <Compile Include="Objects\CreatureTask.cs" />
+    <Compile Include="Objects\TextMessage.cs" />
+    <Compile Include="Objects\Task.cs" />
     <Compile Include="Objects\TaskList.cs" />
     <Compile Include="Objects\TaskMessage.cs" />
     <Compile Include="Program.cs" />

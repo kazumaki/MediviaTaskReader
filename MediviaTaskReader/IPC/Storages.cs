@@ -16,24 +16,24 @@ namespace MediviaTaskReader.IPC
     private TimerCallback cleanMessagesCallback;
     private Timer cleanMessagesTimer;
 
-    private ConcurrentStack<string> messagesStack;
-    private ConcurrentDictionary<string, ConcurrentStack<TaskMessage>> messagesDictionary;
+    private ConcurrentStack<TextMessage> messagesStack;
+    private ConcurrentDictionary<string, ConcurrentQueue<TaskMessage>> messagesDictionary;
     public Storages()
     {
-      this.messagesStack = new ConcurrentStack<string>();
-      this.messagesDictionary = new ConcurrentDictionary<string, ConcurrentStack<TaskMessage>>();
+      this.messagesStack = new ConcurrentStack<TextMessage>();
+      this.messagesDictionary = new ConcurrentDictionary<string, ConcurrentQueue<TaskMessage>>();
       this.filterMessagesCallback = this.filterMessages;
       this.filterMessagesTimer = new Timer(this.filterMessagesCallback, null, 1000, 500);
       this.cleanMessagesCallback = this.cleanMessages;
       this.cleanMessagesTimer = new Timer(this.cleanMessagesCallback, null, 1000, 3 * 60 * 1000);
     }
 
-    public ConcurrentStack<string> MessagesStack
+    public ConcurrentStack<TextMessage> MessagesStack
     {
       get { return this.messagesStack; }
       private set { }
     }
-    public ConcurrentDictionary<string, ConcurrentStack<TaskMessage>> MessagesDictionary
+    public ConcurrentDictionary<string, ConcurrentQueue<TaskMessage>> MessagesDictionary
     {
       get { return this.messagesDictionary; }
       private set { }
@@ -45,27 +45,36 @@ namespace MediviaTaskReader.IPC
       {
         while (!this.messagesStack.IsEmpty)
         {
-          string currentMessage;
+          TextMessage currentMessage;
           if (messagesStack.TryPop(out currentMessage))
           {
-            string[] strippedMessage = currentMessage.Split(' ');
-            if (strippedMessage.Length >= 11 && strippedMessage.Length <= 14)
+            string[] strippedMessage = currentMessage.Message.Split(' ');
+            switch (currentMessage.Type)
             {
-              int nameLen = strippedMessage.Length - 10;
-              int current = Convert.ToInt32(strippedMessage[5]);
-              int total = Convert.ToInt32(strippedMessage[strippedMessage.Length - 2]);
-              string[] strippedCreatureName = new string[nameLen];
-              Array.Copy(strippedMessage, 6, strippedCreatureName, 0, nameLen);
-              string creatureName = string.Join(" ", strippedCreatureName).ToLower();
-              if (this.messagesDictionary.ContainsKey(creatureName))
-              {
-                this.messagesDictionary[creatureName].Push(new TaskMessage(currentMessage, current, total));
-              }
-              else
-              {
-                this.messagesDictionary[creatureName] = new ConcurrentStack<TaskMessage>();
-                this.messagesDictionary[creatureName].Push(new TaskMessage(currentMessage, current, total));
-              }
+              case 9:
+                if(strippedMessage.Length >= 14 && strippedMessage.Length <= 20)
+                {
+                  int nameLen = strippedMessage.Length - 14;
+                  int killCount = Convert.ToInt32(strippedMessage[strippedMessage.Length - 2]);
+                  string[] strippedCreatureName = new string[nameLen];
+                  Array.Copy(strippedMessage, 8, strippedCreatureName, 0, nameLen);
+                  string creatureName = string.Join(" ", strippedCreatureName).ToLower();
+                  this.updateDictionary(creatureName, killCount, killCount);
+                }
+                break;
+
+              case 16:
+                if (strippedMessage.Length >= 11 && strippedMessage.Length <= 14)
+                {
+                  int nameLen = strippedMessage.Length - 10;
+                  int current = Convert.ToInt32(strippedMessage[5]);
+                  int total = Convert.ToInt32(strippedMessage[strippedMessage.Length - 2]);
+                  string[] strippedCreatureName = new string[nameLen];
+                  Array.Copy(strippedMessage, 6, strippedCreatureName, 0, nameLen);
+                  string creatureName = string.Join(" ", strippedCreatureName).ToLower();
+                  this.updateDictionary(creatureName, current, total);
+                }
+                break;
             }
           }
         }
@@ -73,6 +82,19 @@ namespace MediviaTaskReader.IPC
       catch (Exception error)
       {
         System.Windows.Forms.MessageBox.Show(error.ToString());
+      }
+    }
+
+    private void updateDictionary(string creatureName, int current, int total)
+    {
+      if (this.messagesDictionary.ContainsKey(creatureName))
+      {
+        this.messagesDictionary[creatureName].Enqueue(new TaskMessage(current, total));
+      }
+      else
+      {
+        this.messagesDictionary[creatureName] = new ConcurrentQueue<TaskMessage>();
+        this.messagesDictionary[creatureName].Enqueue(new TaskMessage(current, total));
       }
     }
 

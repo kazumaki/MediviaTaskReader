@@ -32,7 +32,7 @@ namespace MediviaTaskReader.Objects
       foreach(CreatureTask task in selectedTasks)
       {
         task.update();
-        File.AppendAllText(allFileName,task.ToString() + Environment.NewLine);
+        File.AppendAllText(allFileName, task.ToString() + Environment.NewLine);
       }
     }
 

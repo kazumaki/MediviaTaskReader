@@ -9,12 +9,11 @@ namespace MediviaTaskReader.Objects
   public class TaskMessage
   {
     private DateTime date;
-    private string message;
+
     private int current;
     private int total;
-    public TaskMessage(string message, int current, int total)
+    public TaskMessage(int current, int total)
     {
-      this.message = message;
       this.current = current;
       this.total = total;
       this.date = DateTime.Now;
@@ -41,14 +40,6 @@ namespace MediviaTaskReader.Objects
       get
       {
         return this.total;
-      }
-    }
-
-    public string Message
-    {
-      get
-      {
-        return this.message;
       }
     }
 

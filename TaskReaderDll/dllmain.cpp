@@ -17,10 +17,15 @@ DWORD ReceiveDataPipeThreadID;
 BOOL isRunning;
 ProcessTextMessage ProcessTextMessagePointer;
 
-BOOL sendMessage(const char* message) {
-	MessageBoxA(NULL, message, "text", MB_OK);
+BOOL sendMessage(const char* message, long long messageType) {
 	bool writeSuccess = false;
 	DWORD bytesWritten;
+
+	do
+	{
+		writeSuccess = WriteFile(SendDataPipe, &messageType, sizeof(messageType), &bytesWritten, NULL);
+	} while (!writeSuccess && isRunning);
+
 
 	do
 	{
@@ -65,11 +70,11 @@ void __fastcall hookProcessTextMessage(DWORD_PTR textPtr) {
 	try {
 		long long messageType = *(long long*)(bufferAddress);
 		CString intStr;
-		if (messageType == 16) {
+		if (messageType == 16 || messageType == 9) {
 			DWORD_PTR messageAddress = *(DWORD_PTR*)(bufferAddress - 0x8);
 			char* message = (char*)messageAddress;
 			if(!IsBadReadPtr(message, sizeof(message)))
-				sendMessage(message);
+				sendMessage(message, messageType);
 		}
 	}
 	catch (int e) {

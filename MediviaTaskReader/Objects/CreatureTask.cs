@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Collections.Concurrent;
 using System.Threading;
 using MediviaTaskReader.IPC;
 
@@ -90,11 +91,11 @@ namespace MediviaTaskReader.Objects
         if (this.ipc.DataStorages.MessagesDictionary.ContainsKey(this.getTaskName()))
         {
           TaskMessage message;
-          if(this.ipc.DataStorages.MessagesDictionary[this.getTaskName()].TryPop(out message))
+          if(this.ipc.DataStorages.MessagesDictionary[this.getTaskName()].TryDequeue(out message))
           {
             this.current = message.Current;
             this.total = message.Total;
-            this.ipc.DataStorages.MessagesDictionary[this.getTaskName()].Clear();
+            this.ipc.DataStorages.MessagesDictionary[this.getTaskName()] = new ConcurrentQueue<TaskMessage>();
             this.updateFiles(message);
           }
 

@@ -79,8 +79,9 @@ namespace MediviaTaskReader.IPC
       {
         try
         {
+          UInt64 type = BitConverter.ToUInt64(this.readBytes(), 0);
           string message = Encoding.UTF8.GetString(this.readBytes()).Trim('\0');
-          this.storages.MessagesStack.Push(message);
+          this.storages.MessagesStack.Push(new TextMessage(message, type));
         }
         catch(Exception error)
         {
